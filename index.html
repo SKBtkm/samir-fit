@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0A0A0B">
+<title>Samir Fit</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%230A0A0B'/%3E%3Ccircle cx='50' cy='50' r='32' fill='none' stroke='%23FF2A3A' stroke-width='12' stroke-linecap='round' stroke-dasharray='170 201' transform='rotate(-90 50 50)'/%3E%3C/svg%3E">
+</head>
+<body>
+<canvas id="fx"></canvas>
+<div class="toast" id="toast"></div>
+
+<div id="splash" style="position:fixed;inset:0;display:grid;place-items:center;background:#0A0A0B;z-index:80">
+  <div style="font:800 30px Manrope,system-ui,sans-serif;letter-spacing:3px;color:#F5F5F7">SAMIR <span style="color:#FF2A3A">FIT</span></div>
+</div>
+
+<div id="app" class="hidden">
+  <div class="wrap">
+    <header id="hdr"></header>
+    <section class="view" id="v0"><div class="st"></div></section>
+    <section class="view" id="v1"><div class="st"></div></section>
+    <section class="view" id="v2"><div class="st"></div></section>
+    <section class="view" id="v3"><div class="st"></div></section>
+  </div>
+  <nav><div class="tabs">
+    <div class="pill" id="pill"></div>
+    <button class="tab on" data-t="0"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/></svg>Главная</button>
+    <button class="tab" data-t="1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12"/></svg>Тренировки</button>
+    <button class="tab" data-t="2"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M7 3v8a3 3 0 0 0 3 3v7M10 3v6M4 3v6a3 3 0 0 0 3 3M17 21V3c2.5 1 4 4 4 8h-4"/></svg>Питание</button>
+    <button class="tab" data-t="3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Прогресс</button>
+  </div></nav>
+</div>
+
+<div class="dim" id="dim"></div>
+<div class="sheet" id="sheet"></div>
+<div class="player" id="player"></div>
+<div class="onb hidden" id="onb"></div>
+
+<script src="js/exercises.js?v=1"></script>
+<script src="js/data.js?v=1"></script>
+<script src="js/storage.js?v=1"></script>
+<script src="js/app.js?v=1"></script>
+</body>
+</html>
