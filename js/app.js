@@ -674,7 +674,8 @@ function renderProgress() {
       <div class="sub">Цель: ${fmt1(p.tw)} кг · ИМТ ${fmt1(bmi)} — ${['дефицит', 'норма', 'избыток', 'ожирение'][bmiI]}</div>
       <div class="bmi">${['#4FC3F7', '#3DDC84', '#FF7A2F', '#FF2A3A'].map((c, i) => `<i class="${i === bmiI ? 'on' : ''}" style="background:${c}"></i>`).join('')}</div>${chart}</div>
     <div class="card" style="--i:5"><h3>${MN[now.getMonth()]} <span>кольца по дням</span></h3><div class="cal">${cal}</div></div>
-    <div class="card" style="--i:6"><h3>Достижения <span>${have.size} / ${ACH.length}</span></h3><div class="badges">${ACH.map(a => `<button class="badge ${have.has(a[0]) ? 'on' : ''}" onclick="toast('${have.has(a[0]) ? '✓ ' : '🔒 '}${a[2]}')"><div class="b">${a[1]}</div>${a[2]}</button>`).join('')}</div></div>`;
+    <div class="card" style="--i:6"><h3>Достижения <span>${have.size} / ${ACH.length}</span></h3><div class="badges">${ACH.map(a => `<button class="badge ${have.has(a[0]) ? 'on' : ''}" onclick="toast('${have.has(a[0]) ? '✓ ' : '🔒 '}${a[2]}')"><div class="b">${a[1]}</div>${a[2]}</button>`).join('')}</div></div>
+    <button class="devfoot" style="--i:7" onclick="openDev()">Разработчик <b>@${DEV}</b></button>`;
   setTimeout(() => $$('#v3 .bcol i').forEach((b, i) => setTimeout(() => b.style.height = b.dataset.h + '%', (i % 7) * 50)), 60);
   $$('#v3 .cal .mini').forEach(s => { ringSVG(s, [14], 4, ['#FF2A3A']); const k = s.dataset.k; if (k <= todayKey()) { const v = ringP(k); setTimeout(() => setRings(s, [(Math.min(v[0], 1) + Math.min(v[1], 1) + Math.min(v[2], 1)) / 3]), 200); } });
 }
@@ -703,10 +704,23 @@ function openProfile() {
       <div class="kv"><span>Где тренируюсь</span><span>${LBL.place[p.place]}</span></div><div class="kv"><span>Тренировок в неделю</span><span>${p.days}</span></div>
       <div class="kv"><span>Базовый обмен</span><span>${fmt(pl.bmr)} ккал</span></div><div class="kv"><span>Расход в день</span><span>${fmt(pl.tdee)} ккал</span></div>
     </div>
+    ${devCard()}
     <button class="btn" onclick="closePage();startOnboarding(true)">Изменить данные</button>
     <button class="btn line" style="margin-top:10px" onclick="resetAll()">Сбросить все данные</button>
     <p class="sub" style="text-align:center;margin-top:18px;line-height:1.5">${DB.cloudOK ? '☁️ Данные сохраняются в твоём Telegram и доступны на всех устройствах' : '📱 Данные сохраняются на этом устройстве'}<br>Samir Fit · версия 1.0</p>`);
 }
+const DEV = 'sahatmuradov';
+function openDev() {
+  haptic('light');
+  const url = 'https://t.me/' + DEV;
+  try { if (ver('6.1') && tg.openTelegramLink) { tg.openTelegramLink(url); return; } } catch (e) {}
+  window.open(url, '_blank');
+}
+const devCard = () => `<button class="card devcard" onclick="openDev()">
+  <div class="devic"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 9l-4 3 4 3M16 9l4 3-4 3M13.5 6l-3 12"/></svg></div>
+  <div style="flex:1;min-width:0;text-align:left"><small>Разработчик</small><b>@${DEV}</b></div>
+  <div class="devgo"><svg viewBox="0 0 24 24" width="18" height="18" fill="#fff"><path d="M21.5 4.3L2.9 11.5c-1.3.5-1.3 1.2-.2 1.6l4.8 1.5 1.8 5.6c.2.6.4.8.9.8.4 0 .6-.2.9-.5l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.1-14.6c.3-1.3-.5-1.8-1.4-1.5zM9.9 14.3l-.4 4 -1.4-4.4 9.8-6.2c.5-.3.9-.1.5.2z"/></svg></div>
+</button>`;
 function resetAll() { ask('Удалить все данные: дневник, вес, достижения и профиль?', async () => { await DB.reset(); location.reload(); }); }
 
 /* ============================================================
