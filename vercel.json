@@ -1,0 +1,8 @@
+{
+  "crons": [
+    { "path": "/api/cron", "schedule": "0 7 * * *" }
+  ],
+  "redirects": [
+    { "source": "/api/_lib/:path*", "destination": "/", "permanent": false }
+  ]
+}
