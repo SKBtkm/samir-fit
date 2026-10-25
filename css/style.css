@@ -444,3 +444,18 @@ canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:100}
 .credit small{display:block;color:var(--muted);font-size:12px;font-weight:700;line-height:1.35}
 .credit b{font-size:17px;font-weight:800}
 .devcard .devic{font-size:20px}
+
+/* ---------- разминка и растяжка ---------- */
+.mobsec{margin-top:4px}
+.mobsec+.mobsec{margin-top:14px}
+.mobsec>small{display:block;color:var(--muted);font-size:12px;font-weight:700;margin-bottom:8px}
+.mobrow{display:flex;gap:8px;overflow-x:auto;margin:0 -18px;padding:0 18px 2px;scrollbar-width:none}
+.mobrow::-webkit-scrollbar{display:none}
+.mob{flex:none;width:112px;background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:8px;display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;transition:transform .15s}
+.mob:active{transform:scale(.95)}
+.mob .thumb{width:100%;height:70px;border-radius:12px;margin-bottom:4px}
+.mob .thumb svg{width:60px;height:60px}
+.mob b{font-size:13px;font-weight:800;line-height:1.2}
+.mob small{color:var(--muted);font-size:11px;font-weight:700}
+.mlinks{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.mlinks button{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 6px;font-size:13px;font-weight:800}

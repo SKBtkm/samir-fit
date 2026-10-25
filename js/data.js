@@ -43,8 +43,45 @@ const PROGRAMS = [
   {id:'g_full', n:'Зал: всё тело', s:'Фулбоди', place:'gym', goals:['lose','keep','gain'], lvl:2, rounds:3, rest:60, tag:'gym',
    d:'Все основные мышцы за одну тренировку.',
    items:[['bsquat',10],['bench',10],['deadlift',8],['ohpress',10],['dbrow',12],['plank',45]]},
+  {id:'core1', n:'Кор: основа', s:'Кор', place:'any', goals:['lose','keep','gain'], lvl:1, rounds:2, rest:20, tag:'abs',
+   d:'Глубокие мышцы кора и стабильность поясницы. Медленно и под контролем.',
+   items:[['deadbug',10],['birddog',10],['plank',30],['sideplank',30],['bridge',12],['hollow',20]]},
+  {id:'core_back', n:'Кор и здоровая спина', s:'Кор', place:'any', goals:['lose','keep','gain'], lvl:1, rounds:2, rest:20, tag:'abs',
+   d:'Укрепляет мышцы вокруг позвоночника и снимает нагрузку с поясницы.',
+   items:[['birddog',12],['deadbug',12],['superman',12],['sideplank',30],['bridge',15],['catcow',30]]},
+  {id:'core2', n:'Кор: стальной пресс', s:'Кор', place:'any', goals:['lose','keep','gain'], lvl:2, rounds:3, rest:20, tag:'abs',
+   d:'Косые, прямая мышца и стабилизаторы — пресс со всех сторон.',
+   items:[['bicycle',20],['russiantwist',20],['flutter',30],['shtaps',16],['sideplank',40],['vup',10]]},
+  {id:'core3', n:'Кор: профи', s:'Кор', place:'any', goals:['lose','keep','gain'], lvl:3, rounds:3, rest:15, tag:'abs',
+   d:'Жёсткая работа на кор для тех, кто уже держит планку 2 минуты.',
+   items:[['hollowrock',30],['vup',15],['plankupdown',10],['russiantwist',30],['legraise',15],['sideplank',60]]},
 ];
-const PROG = Object.fromEntries(PROGRAMS.map(p => [p.id, p]));
+
+/* Разминка (динамическая) и растяжка (статическая) — блок «Разминка и растяжка» в Плане */
+const MOBILITY = [
+  {id:'w_full', icon:'wgs', n:'Разминка: всё тело', s:'Разминка', when:'pre', place:'any', lvl:1, rounds:1, rest:5, tag:'mob',
+   d:'Динамическая разминка перед любой тренировкой: суставы, пульс, мышцы — в рабочий режим.',
+   items:[['jacks',30],['armcircle',30],['torsotwist',30],['hipcircle',20],['legswing',30],['kneehug',30],['sidelunge',30],['inchworm',40],['wgs',40]]},
+  {id:'w_legs', icon:'legswing', n:'Разминка: ноги', s:'Разминка', when:'pre', place:'any', lvl:1, rounds:1, rest:5, tag:'mob',
+   d:'Перед приседаниями, выпадами и тягами: тазобедренные, колени, голеностоп.',
+   items:[['hipcircle',30],['legswing',40],['kneehug',30],['sidelunge',40],['wgs',40],['squat',10],['calf',15]]},
+  {id:'w_upper', icon:'armcircle', n:'Разминка: верх', s:'Разминка', when:'pre', place:'any', lvl:1, rounds:1, rest:5, tag:'mob',
+   d:'Перед жимами, подтягиваниями и отжиманиями: плечи, грудной отдел, кисти.',
+   items:[['armcircle',40],['torsotwist',30],['catcow',30],['inchworm',40],['kneepush',8],['plank',20]]},
+  {id:'w_run', icon:'kneehug', n:'Разминка перед бегом', s:'Разминка', when:'pre', place:'any', lvl:1, rounds:1, rest:5, tag:'mob',
+   d:'Махи и беговые упражнения — бег с первых минут лёгкий и без травм.',
+   items:[['legswing',40],['kneehug',30],['highknees',20],['buttkicks',20],['sidelunge',30],['wgs',30]]},
+  {id:'s_full', icon:'pigeon', n:'Растяжка: всё тело', s:'Растяжка', when:'post', place:'any', lvl:1, rounds:1, rest:5, tag:'mob',
+   d:'После тренировки: расслабить мышцы и успокоить пульс. Тянись без боли, дыши медленно.',
+   items:[['quadstretch',40],['hamstrlie',40],['pigeon',60],['butterfly',40],['crossarm',40],['tristretch',40],['child',40],['cobra',30]]},
+  {id:'s_legs', icon:'quadstretch', n:'Растяжка: ноги', s:'Растяжка', when:'post', place:'any', lvl:1, rounds:1, rest:5, tag:'mob',
+   d:'После дня ног или бега: квадрицепс, задняя поверхность, ягодицы, икры.',
+   items:[['quadstretch',40],['seatfold',45],['hamstrlie',40],['pigeon',60],['butterfly',45],['calfstretch',40],['hipflex',40]]},
+  {id:'s_upper', icon:'crossarm', n:'Растяжка: спина и плечи', s:'Растяжка', when:'post', place:'any', lvl:1, rounds:1, rest:5, tag:'mob',
+   d:'После верха тела или долгого сидения: плечи, грудь, позвоночник.',
+   items:[['crossarm',40],['tristretch',40],['catcow',40],['cobra',30],['child',45]]},
+];
+const PROG = Object.fromEntries(PROGRAMS.concat(MOBILITY).map(p => [p.id, p]));
 
 /* ротации под цель и место */
 const ROTATION = {

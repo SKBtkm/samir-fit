@@ -102,7 +102,7 @@ function progFor(id) {
   const pr = getProg(id); if (!pr) return null;
   if (pr.dir) return Object.assign({}, pr);
   const lvl = (DB.state.p && DB.state.p.lvl) || 2;
-  if (pr.tag === 'stretch') return Object.assign({mode: 'circuit'}, pr);
+  if (pr.tag === 'stretch' || pr.tag === 'mob') return Object.assign({mode: 'circuit'}, pr);
   const rounds = clamp(pr.rounds + (lvl === 3 ? 1 : 0), 1, 6);
   const mult = lvl === 1 ? 0.8 : lvl === 3 ? 1.2 : 1;
   const items = pr.items.map(([e, v]) => [e, EX[e].type === 't' ? Math.max(15, Math.round(v * mult / 5) * 5) : Math.max(5, Math.round(v * mult))]);
@@ -452,7 +452,7 @@ function afterAccess() {
    Тренировки
    ============================================================ */
 let wTab = 'prog', pFilter = 'all', eFilter = 'all';
-const P_FILTERS = [['all','Все'],['home','Дома'],['gym','Зал'],['lose','Похудение'],['strength','Сила'],['abs','Пресс'],['stretch','Растяжка']];
+const P_FILTERS = [['all','Все'],['home','Дома'],['gym','Зал'],['lose','Похудение'],['strength','Сила'],['abs','Кор и пресс'],['stretch','Растяжка']];
 const pMatch = (p, f) => f === 'all' || (f === 'home' && p.place !== 'gym') || (f === 'gym' && p.place !== 'home') ||
   (f === 'lose' && ['hiit','cardio','start','legs','g_full','abs'].includes(p.id)) || (f === 'strength' && ['upper','legs','g_chest','g_back','g_legs','g_sh','g_full'].includes(p.id)) ||
   (f === 'abs' && p.tag === 'abs') || (f === 'stretch' && ['stretch','back'].includes(p.id));
@@ -476,6 +476,7 @@ function renderWorkouts() {
     const tr = trackInfo();
     body = `<div class="card" style="--i:2"><h3>План на неделю <span>${p.days} ${plural(p.days, 'тренировка', 'тренировки', 'тренировок')}</span></h3><div class="plan">${planDays}</div>
         ${tr ? `<div class="trk"><span>📌 ${esc(tr.d.n)} · ${esc(tr.l.n)}</span><button onclick="openDir('${tr.d.id}')">Открыть</button></div>` : ''}</div>
+      ${mobBlock(3)}
       ${tr ? '' : dirPromo(3)}
       <div class="chips" style="--i:4">${P_FILTERS.map(([id, n]) => `<button class="chip ${pFilter === id ? 'on' : ''}" onclick="pFilter='${id}';renderWorkouts()">${n}</button>`).join('')}</div>
       ${PROGRAMS.filter(x => pMatch(x, pFilter)).map((x, i) => progCard(x, i + 5)).join('')}`;
@@ -496,6 +497,14 @@ function renderWorkouts() {
     <div class="seg three" style="--i:1"><div class="sp" style="transform:translateX(${ti * 100}%)"></div>
       ${W_TABS.map(([id, n]) => `<button class="${wTab === id ? 'on' : ''}" onclick="setWTab('${id}')">${n}</button>`).join('')}</div>${body}`;
   FIG.mount($('#v1'));
+}
+const cap = t => t.charAt(0).toUpperCase() + t.slice(1);
+function mobBlock(i) {
+  const card = m => { const est = progEst(progFor(m.id));
+    return `<button class="mob" onclick="openProgram('${m.id}')"><div class="thumb">${FIG.html(m.icon || m.items[0][0], '')}</div><b>${esc(cap(m.n.replace(/^(Разминка|Растяжка): /, '')))}</b><small>${est.min} мин</small></button>`; };
+  return `<div class="card mobcard" style="--i:${i}"><h3>Разминка и растяжка <span>до и после</span></h3>
+    <div class="mobsec"><small>🔥 Перед тренировкой · динамическая разминка</small><div class="mobrow">${MOBILITY.filter(m => m.when === 'pre').map(card).join('')}</div></div>
+    <div class="mobsec"><small>🧘 После тренировки · растяжка</small><div class="mobrow">${MOBILITY.filter(m => m.when === 'post').map(card).join('')}</div></div></div>`;
 }
 function setWTab(t) { if (wTab === t) return; wTab = t; haptic('sel'); renderWorkouts(); }
 function dirPromo(i) {
@@ -558,6 +567,12 @@ function openExInfo(id) {
   if (PL && !PL.paused) togglePause();
 }
 
+function warmFor(pr) {
+  const g = pr.items.map(([e]) => EX[e].g);
+  if (pr.items.some(([e]) => e === 'run' || e === 'runt')) return 'w_run';
+  const up = g.filter(x => ['chest', 'back', 'shoulders', 'arms'].includes(x)).length, lo = g.filter(x => ['legs', 'glutes'].includes(x)).length;
+  return up > lo + 1 ? 'w_upper' : lo > up + 1 ? 'w_legs' : 'w_full';
+}
 function exRows(pr, list, sets) {
   return list.map(it => { const [e, v, note] = it;
     return `<div class="exrow" onclick="openExInfo('${e}')"><div class="thumb">${FIG.html(e, '')}</div><div style="min-width:0"><b>${esc(EX[e].n)}</b><small>${note ? esc(note) : GROUPS[EX[e].g]}</small></div><span class="n">${sets ? itemTxt(pr, it) : valTxt(e, v)}</span></div>`; }).join('');
@@ -568,13 +583,15 @@ function openProgram(id) {
   const est = progEst(pr);
   const lvlN = pr.dir ? pr.lvlN : ['', 'Новичок', 'Средний', 'Продвинутый'][pr.lvl];
   const meta = pr.dir ? `<span>⏱ ~${est.min} мин</span><span>🔥 ~${est.kcal} ккал</span><span>📶 ${esc(lvlN)}</span><span>⚡ ${modeTxt(pr)}</span>`
+    : pr.tag === 'mob' ? `<span>⏱ ${est.min} мин</span><span>${pr.when === 'pre' ? '🔥 Перед тренировкой' : '🧘 После тренировки'}</span><span>📋 ${pr.items.length} упр.</span>`
     : `<span>⏱ ${est.min} мин</span><span>🔥 ~${est.kcal} ккал</span><span>📶 ${lvlN}</span><span>🔁 ${pr.rounds} ${plural(pr.rounds, 'круг', 'круга', 'кругов')}</span><span>⏸ отдых ${pr.rest} с</span>`;
   openPage(`${ptop(pr.dir ? pr.dn : '')}
-    <div class="hero">${FIG.html(pr.items[0][0], '')}</div>
+    <div class="hero">${FIG.html(pr.icon || pr.items[0][0], '')}</div>
     <h2 style="margin:0 0 6px">${esc(pr.n)}</h2><div class="sub">${esc(pr.d)}</div>
     <div class="meta">${meta}</div>
     ${pr.dir ? `<div class="card how"><b>${MODE_N[pr.mode]}</b> — ${MODE_HELP[pr.mode]}</div>` : ''}
     ${pr.wu ? `<div class="card"><h3>Разминка <span>${pr.wu.length} упр.</span></h3>${exRows(pr, pr.wu)}</div>` : ''}
+    ${!pr.wu && pr.tag !== 'mob' && pr.tag !== 'stretch' ? `<div class="mlinks"><button onclick="openProgram('${warmFor(pr)}')">🔥 Разминка перед</button><button onclick="openProgram('${pr.items.some(([e]) => EX[e].g === 'legs' || EX[e].g === 'glutes' || e === 'run') ? 's_legs' : 's_full'}')">🧘 Растяжка после</button></div>` : ''}
     <div class="card"><h3>${pr.dir ? 'Основная часть' : 'Упражнения'} <span>${pr.items.length}</span></h3>${exRows(pr, pr.items, true)}</div>
     ${pr.cd ? `<div class="card"><h3>Заминка <span>${pr.cd.length} упр.</span></h3>${exRows(pr, pr.cd)}</div>` : ''}
     ${pr.dir ? `<div class="credit-s" style="margin-bottom:80px">Программа разработана профессиональным тренером <b>@${esc(CONFIG.TRAINER)}</b></div>` : ''}
@@ -613,7 +630,7 @@ function buildSeq(pr) {
     for (let r = 0; r < R; r++) it.forEach(([e, v, note], i) => main.push({t: 'ex', ex: e, v: vAt(v, r), note, r, i, lab: m === 'amrap' ? `Раунд ${r + 1} · ${i + 1}/${N}` : `${R > 1 ? `Раунд ${r + 1} из ${R} · ` : ''}${i + 1}/${N}`}));
   } else {
     for (let r = 0; r < pr.rounds; r++) it.forEach(([e, v, note], i) => {
-      main.push({t: 'ex', ex: e, v, note, r, i, lab: `Круг ${r + 1} из ${pr.rounds} · ${i + 1}/${N}`});
+      main.push({t: 'ex', ex: e, v, note, r, i, lab: pr.rounds > 1 ? `Круг ${r + 1} из ${pr.rounds} · ${i + 1}/${N}` : `${pr.tag === 'mob' ? pr.s + ' · ' : ''}${i + 1}/${N}`});
       const last = r === pr.rounds - 1 && i === N - 1;
       if (!last && pr.rest > 0) { const ni = (i + 1) % N; main.push({t: 'rest', s: Math.max(5, pr.rest), next: it[ni][0], nv: it[ni][1]}); }
     });
